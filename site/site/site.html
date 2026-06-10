@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empresa Corp · Redefinição de Senha</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f2f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        /* Card principal */
+        .container {
+            max-width: 450px;
+            width: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Cabeçalho */
+        .header {
+            background: white;
+            padding: 30px 30px 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .header .sub {
+            font-size: 14px;
+            color: #666;
+            font-weight: normal;
+        }
+
+        /* Conteúdo */
+        .content {
+            padding: 30px;
+        }
+
+        /* Título da seção */
+        .title-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .title-section h2 {
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .title-section p {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Campos do formulário */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            border-color: #4a90e2;
+        }
+
+        /* Botão */
+        .btn-reset {
+            width: 100%;
+            padding: 12px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn-reset:hover {
+            background: #357abd;
+        }
+
+        /* Mensagens */
+        .message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            text-align: center;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        /* Rodapé */
+        .footer {
+            background: #fafafa;
+            padding: 15px 30px;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Requisitos de senha */
+        .requirements {
+            margin-top: 8px;
+            font-size: 11px;
+            color: #888;
+            padding-left: 5px;
+        }
+
+        .requirements span {
+            display: inline-block;
+            margin-right: 12px;
+            margin-top: 5px;
+        }
+
+        .requirements .valid {
+            color: #28a745;
+        }
+
+        .requirements .invalid {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Empresa Corp</h1>
+            <div class="sub">· Portal de TI</div>
+        </div>
+
+        <div class="content">
+            <div class="title-section">
+                <h2>Redefinição de Senha Corporativa</h2>
+                <p>Sua senha expirou. Confirme sua identidade para continuar.</p>
+            </div>
+
+            <form id="resetForm">
+                <div class="form-group">
+                    <label>Usuário (login corporativo)</label>
+                    <input type="text" id="username" name="username" autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label>Senha atual</label>
+                    <input type="password" id="currentPassword" name="currentPassword" autocomplete="current-password">
+                </div>
+
+                <div class="form-group">
+                    <label>Nova senha</label>
+                    <input type="password" id="newPassword" name="newPassword" autocomplete="new-password">
+                    <div class="requirements" id="reqContainer">
+                        <span id="reqLength">🔘 8+ caracteres</span>
+                        <span id="reqUpper">🔘 Maiúscula</span>
+                        <span id="reqNumber">🔘 Número</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-reset">Redefinir Senha Agora</button>
+            </form>
+
+            <div id="message" class="message"></div>
+        </div>
+
+        <div class="footer">
+            © 2025 Empresa Corp. Todos os direitos reservados
+        </div>
+    </div>
+
+    <script>
+        // Dados simulados de usuários
+        const usersDB = {
+            "joao.silva": { password: "Joao@123", name: "João Silva" },
+            "mariana.oliveira": { password: "Mari@456", name: "Mariana Oliveira" },
+            "carlos.santos": { password: "Carlos@789", name: "Carlos Santos" },
+            "ana.costa": { password: "Ana@321", name: "Ana Costa" }
+        };
+
+        const form = document.getElementById('resetForm');
+        const usernameInput = document.getElementById('username');
+        const currentPassInput = document.getElementById('currentPassword');
+        const newPassInput = document.getElementById('newPassword');
+        const messageDiv = document.getElementById('message');
+
+        // Elementos requisitos
+        const reqLength = document.getElementById('reqLength');
+        const reqUpper = document.getElementById('reqUpper');
+        const reqNumber = document.getElementById('reqNumber');
+
+        function showMessage(text, isError = true) {
+            messageDiv.textContent = text;
+            messageDiv.className = 'message';
+            if (isError) {
+                messageDiv.classList.add('error');
+            } else {
+                messageDiv.classList.add('success');
+            }
+            
+            setTimeout(() => {
+                if (messageDiv.textContent === text) {
+                    messageDiv.className = 'message';
+                    messageDiv.textContent = '';
+                }
+            }, 4000);
+        }
+
+        function validatePassword(password) {
+            const checks = {
+                length: password.length >= 8,
+                upper: /[A-Z]/.test(password),
+                number: /[0-9]/.test(password)
+            };
+            return checks;
+        }
+
+        function updateRequirements(password) {
+            const checks = validatePassword(password);
+            
+            if (checks.length) {
+                reqLength.innerHTML = '✅ 8+ caracteres';
+                reqLength.className = 'valid';
+            } else {
+                reqLength.innerHTML = '🔘 8+ caracteres';
+                reqLength.className = 'invalid';
+            }
+            
+            if (checks.upper) {
+                reqUpper.innerHTML = '✅ Maiúscula';
+                reqUpper.className = 'valid';
+            } else {
+                reqUpper.innerHTML = '🔘 Maiúscula';
+                reqUpper.className = 'invalid';
+            }
+            
+            if (checks.number) {
+                reqNumber.innerHTML = '✅ Número';
+                reqNumber.className = 'valid';
+            } else {
+                reqNumber.innerHTML = '🔘 Número';
+                reqNumber.className = 'invalid';
+            }
+            
+            return checks;
+        }
+
+        newPassInput.addEventListener('input', function() {
+            updateRequirements(this.value);
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = usernameInput.value.trim();
+            const currentPassword = currentPassInput.value;
+            const newPassword = newPassInput.value;
+            
+            // Valida campos vazios
+            if (!username) {
+                showMessage('Por favor, informe o usuário.', true);
+                usernameInput.focus();
+                return;
+            }
+            
+            if (!currentPassword) {
+                showMessage('Por favor, informe sua senha atual.', true);
+                currentPassInput.focus();
+                return;
+            }
+            
+            if (!newPassword) {
+                showMessage('Por favor, informe a nova senha.', true);
+                newPassInput.focus();
+                return;
+            }
+            
+            // Verifica se usuário existe
+            const user = usersDB[username.toLowerCase()];
+            if (!user) {
+                showMessage('Usuário não encontrado.', true);
+                usernameInput.focus();
+                return;
+            }
+            
+            // Verifica senha atual
+            if (user.password !== currentPassword) {
+                showMessage('Senha atual incorreta.', true);
+                currentPassInput.focus();
+                return;
+            }
+            
+            // Verifica requisitos da nova senha
+            const passwordChecks = validatePassword(newPassword);
+            if (!passwordChecks.length || !passwordChecks.upper || !passwordChecks.number) {
+                showMessage('A nova senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um número.', true);
+                return;
+            }
+            
+            // Verifica se nova senha é diferente da atual
+            if (newPassword === currentPassword) {
+                showMessage('A nova senha deve ser diferente da senha atual.', true);
+                return;
+            }
+            
+            // Atualiza senha
+            usersDB[username.toLowerCase()].password = newPassword;
+            
+            // Limpa campos
+            currentPassInput.value = '';
+            newPassInput.value = '';
+            updateRequirements('');
+            
+            // Mensagem de sucesso
+            showMessage(`Senha redefinida com sucesso para ${user.name}!`, false);
+            
+            // Opcional: limpa mensagem após 3 segundos
+            setTimeout(() => {
+                usernameInput.value = '';
+            }, 2000);
+        });
+        
+        // Inicializa requisitos
+        updateRequirements('');
+    </script>
+</body>
+</html>
